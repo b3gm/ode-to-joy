@@ -1,18 +1,20 @@
+import { array } from "./array-backed-types/ab-array";
+
 export function assertSameLength(a: Float64Array, b: Float64Array) {
   if (a.length !== b.length) {
-    throw new Error("Arrays are not of the same length.");
+    throw new Error(
+      `Expected array to be of length ${a.length}, however actual length: ${b.length}.`
+    );
   }
 }
 
 export function zeroes(length: number): Float64Array {
-  const result = new Float64Array();
-  result.fill(0.0, length);
-  return result;
+  return new Float64Array(length);
 }
 
 export function add(aElements: Float64Array, oElements: Float64Array): Float64Array {
   assertSameLength(aElements, oElements);
-  const result = new Float64Array();
+  const result = new Float64Array(aElements.length);
   const end = aElements.length;
   for (let i = 0; i !== end; ++i) {
     result[i] = aElements[i] + oElements[i];
@@ -22,7 +24,7 @@ export function add(aElements: Float64Array, oElements: Float64Array): Float64Ar
 
 export function subtract(aElements: Float64Array, oElements: Float64Array): Float64Array {
   assertSameLength(aElements, oElements);
-  const result = new Float64Array();
+  const result = new Float64Array(aElements.length);
   const end = aElements.length;
   for (let i = 0; i !== end; ++i) {
     result[i] = aElements[i] - oElements[i];
@@ -31,7 +33,7 @@ export function subtract(aElements: Float64Array, oElements: Float64Array): Floa
 }
 
 export function scalarMultiply(aElements: Float64Array, f: number): Float64Array {
-  const result = new Float64Array();
+  const result = new Float64Array(aElements.length);
   const end = aElements.length;
   for (let i = 0; i !== end; ++i) {
     result[i] = aElements[i] * f;
@@ -40,7 +42,7 @@ export function scalarMultiply(aElements: Float64Array, f: number): Float64Array
 }
 
 export function scalarDivide(aElements: Float64Array, f: number): Float64Array {
-  const result = new Float64Array();
+  const result = new Float64Array(aElements.length);
   const end = aElements.length;
   for (let i = 0; i !== end; ++i) {
     result[i] = aElements[i] / f;
@@ -82,8 +84,15 @@ export function scalarDivideSelf(aElements: Float64Array, f: number): Float64Arr
   return aElements;
 }
 
+export function addAllToFirst(first: Float64Array, ...others: Float64Array[]): Float64Array {
+  for(let i = 0; i !== others.length; ++i) {
+    addSelf(first, others[i]);
+  }
+  return first;
+}
+
 export function clone(aElements: Float64Array): Float64Array {
-  const result = new Float64Array();
+  const result = new Float64Array(aElements.length);
   const end = aElements.length;
   for (let i = 0; i !== end; ++i) {
     result[i] = aElements[i];
