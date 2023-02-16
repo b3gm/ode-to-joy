@@ -14,9 +14,6 @@ const config: Configuration & WebPackDevServerConfig = {
       {
         test: /\.ts$/,
         loader: "ts-loader",
-        options: {
-          configFile: "tsconfig.testApp.json"
-        }
       },
       {
         test: /\.html$/,

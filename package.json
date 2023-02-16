@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "npx jest",
+    "build:production": "npx tsc -p tsconfig.prod.json",
     "start:dev": "npx webpack serve -c webpack.testconfig.ts"
   },
   "repository": {

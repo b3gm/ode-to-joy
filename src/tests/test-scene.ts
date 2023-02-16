@@ -16,7 +16,10 @@ function createTestScene(cvs: HTMLCanvasElement) {
     10000.0
   );
   scene.add(light);
-  const renderer = new three.WebGLRenderer();
+  const renderer = new three.WebGLRenderer({
+    canvas: cvs,
+    logarithmicDepthBuffer: true,
+  });
 }
 
 interface TestSceneProperties {
