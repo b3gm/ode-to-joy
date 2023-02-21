@@ -7,7 +7,10 @@ export interface ABObjectProperty<T, K extends keyof T> {
   abType: ABType<T[K]>;
 }
 
-export function object<T, K extends keyof T>(props: ABObjectDescription<T, K>): ABType<T> {
+export function object<
+  T,
+  K extends keyof T
+>(props: ABObjectDescription<T, K>): ABType<T> {
   let size = 0;
   const properties: ABObjectProperty<T, K>[] = [];
   for (let key in props) {

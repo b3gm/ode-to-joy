@@ -1,6 +1,6 @@
 import { ABType } from "./ab-type";
 
-export function float() {
+export function float(): ABType<number> {
   return ABFloat.instance;
 }
 

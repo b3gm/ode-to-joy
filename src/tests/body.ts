@@ -1,10 +1,11 @@
-import * as three from "three";
+import { Mesh, Quaternion, Vector3 } from "three";
 
 export interface Body {
   mass: number;
-  orientation: three.Quaternion;
-  angularVelocity: three.Quaternion;
-  position: three.Vector3;
-  velocity: three.Vector3;
-  force: three.Vector3;
+  orientation: Quaternion;
+  angularVelocity: Quaternion;
+  position: Vector3;
+  velocity: Vector3;
+  force: Vector3;
+  mesh: Mesh;
 }
