@@ -1,10 +1,10 @@
 import { ABType } from "./ab-type";
 
-export type ABObjectDescription<T, K extends keyof T> = {[P in K]: ABType<T[P]>};
+export type ABObjectDescription<T, K extends keyof T> = {readonly [P in K]: ABType<T[P]>};
 
 export interface ABObjectProperty<T, K extends keyof T> {
-  key: K;
-  abType: ABType<T[K]>;
+  readonly key: K;
+  readonly abType: ABType<T[K]>;
 }
 
 export function object<
