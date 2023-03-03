@@ -4,6 +4,7 @@ import { Vector3, Quaternion } from "three";
 import { SolarSystem } from "./solar-system";
 import { defaultMeshFactory, MeshFactory } from "./mesh-factory";
 import { RngUtil } from "./rng-util";
+import { Vector } from "../vector";
 
 const ex = Object.freeze(new Vector3(1.0, 0, 0));
 const ey = Object.freeze(new Vector3(0.0, 1.0, 0.0));
@@ -183,9 +184,25 @@ export function createSolarSystem(props: SolarSystemProps = {}): SolarSystem {
       )
     );
   }
+  // settiung total momentum to 0.0
+  const totalMass = 
+    asteroids.reduce((acc, ast) => acc + ast.mass, 0.0)
+    + celestialBodies.reduce((acc, body) => acc + body.mass, 0.0);
+  const systemCogVelocity = asteroids.reduce(
+    (acc, ast) => acc.add(ast.velocity.clone().multiplyScalar(ast.mass)), new Vector3()
+  )
+    .add(
+      celestialBodies.reduce(
+        (acc, body) => acc.add(body.velocity.clone().multiplyScalar(body.mass)),
+        new Vector3()
+      )
+    )
+    .divideScalar(totalMass);
+  celestialBodies.forEach(body => body.velocity.sub(systemCogVelocity));
+  asteroids.forEach(ast => ast.velocity.sub(systemCogVelocity));
   return {
     gravityConstant,
     celestialBodies,
     asteroids
-  }
+  };
 }
