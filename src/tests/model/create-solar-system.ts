@@ -4,7 +4,7 @@ import { Vector3, Quaternion } from "three";
 import { SolarSystem } from "./solar-system";
 import { defaultMeshFactory, MeshFactory } from "./mesh-factory";
 import { RngUtil } from "./rng-util";
-import { Vector } from "../vector";
+import { Vector } from "../../vector";
 
 const ex = Object.freeze(new Vector3(1.0, 0, 0));
 const ey = Object.freeze(new Vector3(0.0, 1.0, 0.0));

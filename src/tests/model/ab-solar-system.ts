@@ -1,5 +1,5 @@
 import { Vector3 } from "three";
-import { abTypes } from "../index";
+import { abTypes } from "../../index";
 import { Body } from "./body";
 import { SolarSystem } from "./solar-system";
 

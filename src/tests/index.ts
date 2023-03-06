@@ -5,10 +5,10 @@ import { ABType } from "../array-backed-types/ab-type";
 import { heunMethod, midPointMethod } from "../explicit-solvers";
 import { createGenericExplicitSolver } from "../generic-explicit-solver";
 import { abTypes } from "../index";
-import { abSolarSystem } from "./ab-solar-system";
-import { Body } from "./body";
-import { createSolarSystem } from "./create-solar-system";
-import { SolarSystem } from "./solar-system";
+import { abSolarSystem } from "./model/ab-solar-system";
+import { Body } from "./model/body";
+import { createSolarSystem } from "./model/create-solar-system";
+import { SolarSystem } from "./model/solar-system";
 
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Dom ready!");
