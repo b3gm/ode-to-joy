@@ -1,10 +1,11 @@
 import { Mesh, Quaternion, Vector3 } from "three";
+import { AxialAmount } from "./axial-amount";
 import { LQuaternion, LVec3 } from "./literals";
 
 export interface Body {
   mass: number;
   orientation: Quaternion;
-  angularVelocity: Quaternion;
+  angularVelocity: AxialAmount;
   position: Vector3;
   velocity: Vector3;
   force: Vector3;
@@ -16,7 +17,7 @@ export interface Body {
 export interface BodyParameters {
   mass: number;
   orientation: LQuaternion;
-  angularVelocity: LQuaternion;
+  angularVelocity: AxialAmount;
   position: LVec3;
   velocity: LVec3;
   mesh: Mesh;
@@ -38,7 +39,7 @@ export abstract class BaseBody implements Body {
 
   public readonly mass: number;
   public readonly orientation: Quaternion;
-  public readonly angularVelocity: Quaternion;
+  public readonly angularVelocity: AxialAmount;
   public readonly position: Vector3;
   public readonly velocity: Vector3;
   public readonly force: Vector3;
@@ -48,7 +49,7 @@ export abstract class BaseBody implements Body {
     this.mass = parameters.mass;
     const mesh = parameters.mesh;
     this.orientation = assignQuaternion(mesh.quaternion, parameters.orientation);
-    this.angularVelocity = assignQuaternion(new Quaternion(), parameters.angularVelocity);
+    this.angularVelocity = parameters.angularVelocity;
     this.position = assignVector(mesh.position, parameters.position);
     this.velocity = assignVector(new Vector3(), parameters.velocity);
     this.force = new Vector3();
@@ -65,12 +66,15 @@ export class CelestialBody extends BaseBody {
   }
 
   public tic(delta: number): void {
+    const angVelQuat = new Quaternion().setFromAxisAngle(
+      this.angularVelocity.axis,
+      this.angularVelocity.amount * delta
+    );
     this.orientation.multiplyQuaternions(
-      this.angularVelocity
-        .clone()
+      angVelQuat.clone()
         .conjugate()
         .multiply(this.orientation),
-      this.angularVelocity
+      angVelQuat
     )
   }
 }
