@@ -13,6 +13,20 @@ class TestVector {
   }
 }
 
+class Body {
+  private force: TestVector;
+  constructor(
+    public position: TestVector,
+    public velocity: TestVector
+  ) {
+    this.force = new TestVector(0, 0, 0);
+  }
+  
+  applyForce(force: TestVector): void {
+    force = new TestVector(this.force.x + force.x, this.force.y + force.y, this.force.z + force.z);
+  };
+}
+
 interface LVec3 {
   readonly x: number;
   readonly y: number;
@@ -26,9 +40,13 @@ interface PartialVector {
 
 describe("ABObjectType", () => {
   it("should be fine with subset of properties", () => {
-    const testVectorType = abTypes.object<TestVector, keyof PartialVector>({
+    const testVectorType: ABType<TestVector> = abTypes.object({
       x: abTypes.float(),
-      y: abTypes.float(),
+      y: abTypes.float()
+    });
+    const testVectorType2 = abTypes.object<TestVector>({
+      x: abTypes.float(),
+      z: abTypes.float()
     })
   });
   it ("should reject invalid keys", () => {
@@ -36,7 +54,7 @@ describe("ABObjectType", () => {
     const testVectorType = abTypes.object<TestVector, "x" | "y" | "foo">({
       x: abTypes.float(),
       y: abTypes.float(),
-      foo: abTypes.float(),
+      foo: abTypes.float()
     })
   });
   it ("should work without type parameters", () => {
@@ -46,11 +64,22 @@ describe("ABObjectType", () => {
       z: abTypes.float()
     });
   });
+  it ("should suggest public object property types", () => {
+    const testVectorType = abTypes.object<TestVector>({
+      x: abTypes.float(),
+      y: abTypes.float(),
+      z: abTypes.float()
+    });
+    const bodyType = abTypes.object<Body>({
+      position: testVectorType,
+      velocity: testVectorType
+    });
+  })
 });
 
 describe("ABArray<TestVector>", () => {
   it("should work with arrays", () => {
-    const testVectorType = abTypes.object<TestVector, "x" | "y" | "z">({
+    const testVectorType = abTypes.object<TestVector>({
       x: abTypes.float(),
       y: abTypes.float(),
       z: abTypes.float()

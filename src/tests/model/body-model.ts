@@ -10,9 +10,5 @@ export const vector3Model: ABType<Vector3> = abTypes.object({
 })
 
 export const bodyModel: ABType<Body> = abTypes.object({
-  position: abTypes.object({
-    x: abTypes.float(),
-    y: abTypes.float(),
-    z: abTypes.float()
-  })
+  position: vector3Model
 });

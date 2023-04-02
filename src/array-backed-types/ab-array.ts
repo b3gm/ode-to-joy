@@ -1,15 +1,20 @@
-import { ABType } from "./ab-type";
+import { ABFixedSizeType, ABType, BaseABFixedSizeType } from "./ab-type";
 
-export function array<T>(abType: ABType<T>, length: number): ABType<T[]> {
-  return new ABArray(abType, length);
+export function array<T>(abType: ABType<T>, fixedLength: number = -1.0): ABType<T[]> {
+  switch(abType.abSizeType) {
+    case "FIXED":
+      if (fixedLength >= 0) {
+        return new ABFixedSizeArray(abType, fixedLength);
+      }
+      break;
+  }
+  throw new Error("Not implemented.");
 }
 
-class ABArray<T> implements ABType<T[]> {
+class ABFixedSizeArray<T> extends BaseABFixedSizeType<T[]> {
 
-  public readonly size;
-
-  constructor(private readonly itemType: ABType<T>, private readonly length: number) {
-    this.size = length * itemType.size;
+  constructor(private readonly itemType: ABFixedSizeType<T>, private readonly length: number) {
+    super(length * itemType.size);
   }
 
   extractValues(value: T[], arr: Float64Array): void {
@@ -35,10 +40,6 @@ class ABArray<T> implements ABType<T[]> {
       index = nextIndex;
     }
     return value;
-  }
-
-  get isDynamicSized(): boolean {
-    return false;
   }
 
 }

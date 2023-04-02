@@ -1,33 +1,39 @@
-import { ABType } from "./ab-type";
+import { ABObjectDescription, ABFixedSizeObjectProperty, ABDynamicSizeObjectProperty } from "./ab-object-description";
+import { ABType, BaseABDynamicSizeType, BaseABFixedSizeType } from "./ab-type";
 
-export type ABObjectDescription<T, K extends keyof T> = {readonly [P in K]: ABType<T[P]>};
-
-export interface ABObjectProperty<T, K extends keyof T> {
-  readonly key: K;
-  readonly abType: ABType<T[K]>;
-}
 
 export function object<
-  T,
-  K extends keyof T
->(props: ABObjectDescription<T, K>): ABType<T> {
-  let size = 0;
-  const properties: ABObjectProperty<T, K>[] = [];
+  T
+>(props: ABObjectDescription<T>): ABType<T> {
+  let fixedSize = 0;
+  const fixedProperties: ABFixedSizeObjectProperty<T, keyof T>[] = [];
+  const dynamicProperties: ABDynamicSizeObjectProperty<T, keyof T>[] = [];
   for (let key in props) {
     const abType = props[key];
-    size += abType.size;
-    const property = { key, abType };
-    properties.push(property);
+    if (abType !== undefined) {
+      switch(abType.abSizeType) {
+      case "FIXED":
+        fixedProperties.push({key, abType} as ABFixedSizeObjectProperty<T, keyof T>);
+        fixedSize += abType.size;
+        break;
+      case "DYNAMIC":
+        dynamicProperties.push({key, abType} as ABDynamicSizeObjectProperty<T, keyof T>);
+        break;
+      }
+    }
   }
-  return new ABObject(properties, size);
+  if (dynamicProperties.length === 0) {
+    return new ABFixedSizeObject(fixedProperties, fixedSize);
+  }
+  return new ABDynamicSizeObject(fixedProperties, fixedSize, dynamicProperties);
 }
 
-class ABObject<T, K extends keyof T> implements ABType<T> {
-
+class ABFixedSizeObject<T, K extends keyof T> extends BaseABFixedSizeType<T> {
   constructor(
-    private readonly properties: ABObjectProperty<T, K>[],
-    public readonly size: number
+    private readonly properties: ABFixedSizeObjectProperty<T, K>[],
+    size: number
   ) {
+    super(size);
   }
 
   extractValues(value: T, arr: Float64Array): void {
@@ -52,6 +58,32 @@ class ABObject<T, K extends keyof T> implements ABType<T> {
       index = nextIndex
     }
     return value;
+  }
+}
+
+export class ABDynamicSizeObject<T> extends BaseABDynamicSizeType<T> {
+
+  constructor(
+    private readonly fixedProperties: ABFixedSizeObjectProperty<T, keyof T>[],
+    private readonly fixedSize: number,
+    private readonly dynamicSizeObjectProperties: ABDynamicSizeObjectProperty<T, keyof T>[]
+  ) {
+    super();
+  }
+
+  public getSize(value: T): number {
+    return this.fixedSize + this.dynamicSizeObjectProperties.reduce(
+      (size, {key, abType}) => size + abType.getSize(value[key]),
+      0
+    );
+  }
+
+  public applyValues(arr: Float64Array, value: T): T {
+    throw new Error("Not implemented.");
+  }
+
+  public extractValues(value: T, arr: Float64Array): void {
+    throw new Error("Not implemented.");
   }
 
 }
