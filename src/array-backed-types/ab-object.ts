@@ -1,4 +1,4 @@
-import { ABObjectDescription, ABFixedSizeObjectProperty, ABDynamicSizeObjectProperty } from "./ab-object-description";
+import { ABObjectDescription, ABFixedSizeObjectProperty, ABDynamicSizeObjectProperty, ABObjectProperty } from "./ab-object-description";
 import { ABType, BaseABDynamicSizeType, BaseABFixedSizeType } from "./ab-type";
 
 
@@ -13,11 +13,17 @@ export function object<
     if (abType !== undefined) {
       switch(abType.abSizeType) {
       case "FIXED":
-        fixedProperties.push({key, abType} as ABFixedSizeObjectProperty<T, keyof T>);
+        fixedProperties.push({
+          key,
+          abType
+        } as ABFixedSizeObjectProperty<T, keyof T>);
         fixedSize += abType.size;
         break;
       case "DYNAMIC":
-        dynamicProperties.push({key, abType} as ABDynamicSizeObjectProperty<T, keyof T>);
+        dynamicProperties.push({
+          key,
+          abType
+        } as ABDynamicSizeObjectProperty<T, keyof T>);
         break;
       }
     }
@@ -26,6 +32,42 @@ export function object<
     return new ABFixedSizeObject(fixedProperties, fixedSize);
   }
   return new ABDynamicSizeObject(fixedProperties, fixedSize, dynamicProperties);
+}
+
+function extractValues<T, ABT extends ABObjectProperty<T, keyof T>>(
+  properties: ABT[],
+  value: T,
+  arr: Float64Array,
+  sizeGetter: (abType: ABT["abType"], propertyValue: T[keyof T]) => number
+) {
+  let index = 0;
+  for (const {key, abType} of properties) {
+    const propertyValue = value[key];
+    const nextIndex = index + sizeGetter(abType, propertyValue);
+    abType.extractValues(propertyValue, arr.subarray(index, nextIndex));
+    index = nextIndex;
+  }
+  return index;
+}
+
+function applyValues<T, ABT extends ABObjectProperty<T, keyof T>>(
+  properties: ABT[],
+  arr: Float64Array,
+  value: T,
+  sizeGetter: (abType: ABT["abType"], v: T[keyof T]) => number
+) {
+  let index = 0;
+  for (const {key, abType} of properties) {
+    const targetValue = value[key];
+    let nextIndex = index + sizeGetter(abType, targetValue);
+    const appliedValue = abType.applyValues(
+      arr.subarray(index, nextIndex),
+      targetValue
+    );
+    value[key] = appliedValue;
+    index = nextIndex
+  }
+  return value;
 }
 
 class ABFixedSizeObject<T, K extends keyof T> extends BaseABFixedSizeType<T> {
@@ -37,13 +79,7 @@ class ABFixedSizeObject<T, K extends keyof T> extends BaseABFixedSizeType<T> {
   }
 
   extractValues(value: T, arr: Float64Array): void {
-    let index = 0;
-    for (const {key, abType} of this.properties) {
-      const nextIndex = index + abType.size;
-      const propertyValue = value[key];
-      abType.extractValues(propertyValue, arr.subarray(index, nextIndex));
-      index = nextIndex;
-    }
+    extractValues(this.properties, value, arr, (abt) => abt.size);
   }
 
   applyValues(arr: Float64Array, value: T): T {
@@ -79,11 +115,34 @@ export class ABDynamicSizeObject<T> extends BaseABDynamicSizeType<T> {
   }
 
   public applyValues(arr: Float64Array, value: T): T {
-    throw new Error("Not implemented.");
+    applyValues(
+      this.fixedProperties,
+      arr.subarray(0, this.fixedSize),
+      value,
+      (abt) => abt.size
+    );
+    applyValues(
+      this.dynamicSizeObjectProperties,
+      arr.subarray(this.fixedSize, arr.length),
+      value,
+      (abt, v) => abt.getSize(v)
+    );
+    return value;
   }
 
   public extractValues(value: T, arr: Float64Array): void {
-    throw new Error("Not implemented.");
+    extractValues(
+      this.fixedProperties,
+      value,
+      arr.subarray(0, this.fixedSize),
+      (abt) => abt.size
+    );
+    extractValues(
+      this.dynamicSizeObjectProperties,
+      value,
+      arr.subarray(this.fixedSize, arr.length),
+      (abt, v) => abt.getSize(v)
+    )
   }
 
 }
