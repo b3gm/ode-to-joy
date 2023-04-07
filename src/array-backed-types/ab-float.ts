@@ -1,4 +1,9 @@
-import { ABType, BaseABFixedSizeType } from "./ab-type";
+import {
+  ABType,
+  BaseABFixedSizeType,
+  FloatReader,
+  FloatWriter
+} from "./ab-type";
 
 export function float(): ABType<number> {
   return ABFloat.instance;
@@ -12,12 +17,12 @@ export class ABFloat extends BaseABFixedSizeType<number> {
     super(1.0);
   }
   
-  extractValues(value: number, arr: Float64Array): void {
-    arr[0] = value;
+  extractValues(value: number, writer: FloatWriter): void {
+    writer(value);
   }
 
-  applyValues(arr: Float64Array, previousValue: number): number {
-    return arr[0];
+  applyValues(reader: FloatReader, _: number): number {
+    return reader();
   }
 
 }

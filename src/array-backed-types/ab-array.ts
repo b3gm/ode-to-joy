@@ -1,14 +1,39 @@
-import { ABFixedSizeType, ABType, BaseABFixedSizeType } from "./ab-type";
+import {
+  ABFixedSizeType,
+  ABType,
+  BaseABDynamicSizeType,
+  BaseABFixedSizeType,
+  FloatReader,
+  FloatWriter
+} from "./ab-type";
+import { unknownEnumValue } from "./utils";
 
 export function array<T>(abType: ABType<T>, fixedLength: number = -1.0): ABType<T[]> {
-  switch(abType.abSizeType) {
+  if (fixedLength < 0) {
+    return new ABDynamicSizeArray(abType);
+  } else {
+    const abSizeType = abType.abSizeType;
+    switch(abSizeType) {
     case "FIXED":
-      if (fixedLength >= 0) {
-        return new ABFixedSizeArray(abType, fixedLength);
-      }
-      break;
+      return new ABFixedSizeArray(abType, fixedLength);
+    case "DYNAMIC":
+      return new ABDynamicSizeArray(abType);
+    default:
+      return unknownEnumValue(abSizeType);
+    }
   }
-  throw new Error("Not implemented.");
+}
+
+function extractValues<T>(itemType: ABType<T>, values: T[], writer: FloatWriter): void {
+  values.forEach((v) => itemType.extractValues(v, writer));
+}
+
+function applyValues<T>(itemType: ABType<T>, reader: FloatReader, values: T[]): T[] {
+  for (let i = 0; i != values.length; ++i) {
+    // updating array in place is intentional.
+    values[i] = itemType.applyValues(reader, values[i]);
+  }
+  return values;
 }
 
 class ABFixedSizeArray<T> extends BaseABFixedSizeType<T[]> {
@@ -17,29 +42,46 @@ class ABFixedSizeArray<T> extends BaseABFixedSizeType<T[]> {
     super(length * itemType.size);
   }
 
-  extractValues(value: T[], arr: Float64Array): void {
-    if (value.length !== this.length) {
+  extractValues(values: T[], writer: FloatWriter): void {
+    if (values.length !== this.length) {
       throw new Error(
-        `Expected array of length ${this.length}, got array of length ${value.length} instead.`
+        `Expected array of length ${this.length}, got array of length ${values.length} instead.`
       );
     }
-    const itemType = this.itemType;
-    for (const item of value) {
-      itemType.extractValues(item, arr);
+    extractValues(this.itemType, values, writer);
+  }
+
+  applyValues(reader: FloatReader, values: T[]): T[] {
+    return applyValues(this.itemType, reader, values);
+  }
+}
+
+class ABDynamicSizeArray<T> extends BaseABDynamicSizeType<T[]> {
+  constructor(
+    private readonly itemType: ABType<T>
+  ) {
+    super();
+  }
+
+  public getSize(value: T[]): number {
+    const abType = this.itemType;
+    const abSizeType = abType.abSizeType;
+    switch(abSizeType) {
+    case "FIXED":
+      return value.length * abType.size;
+    case "DYNAMIC":
+      return value.reduce((acc, v) => acc + abType.getSize(v), 0);
+    default:
+      return unknownEnumValue(abSizeType);
     }
   }
 
-  applyValues(arr: Float64Array, value: T[]): T[] {
-    const itemType = this.itemType;
-    let index = 0;
-    for (let i = 0; i != value.length; ++i) {
-      const nextIndex = index + itemType.size;
-      const currentValue = value[i];
-      const appliedValue = itemType.applyValues(arr.subarray(index, nextIndex), currentValue);
-      value[i] = appliedValue;
-      index = nextIndex;
-    }
-    return value;
+  public extractValues(values: T[], writer: FloatWriter): void {
+    extractValues(this.itemType, values, writer);
+  }
+
+  public applyValues(reader: FloatReader, values: T[]): T[] {
+    return applyValues(this.itemType, reader, values);
   }
 
 }

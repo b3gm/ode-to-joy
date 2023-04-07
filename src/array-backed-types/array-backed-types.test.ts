@@ -98,24 +98,24 @@ interface Body {
 
 describe("ABValue<TestVector>", () => {
   it("should work with value types", () => {
-    const testVectorValueType = abTypes.valueObject(
+    const testVectorValueType = abTypes.valueObject<TestVector, LVec3>(
       ({x, y, z}) => new TestVector(x, y, z),
       {
         x: {
           abType: abTypes.float(),
-          accessor: v => v.x
+          accessor: (v) => v.x
         },
         y: {
           abType: abTypes.float(),
-          accessor: v => v.y
+          accessor: (v) => v.y
         },
         z: {
           abType: abTypes.float(),
-          accessor: v => v.z
+          accessor: (v) => v.z
         }
       }
     );
-    const bodyTypey: ABType<Body> = abTypes.object({
+    const bodyType: ABType<Body> = abTypes.object({
       position: testVectorValueType,
       velocity: testVectorValueType
     })
