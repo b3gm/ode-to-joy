@@ -6,9 +6,12 @@ import HtmlWebpackPlugin from "html-webpack-plugin";
 const config: Configuration & WebPackDevServerConfig = {
   mode: "development",
   entry: {
-    index: "./test-src/index.ts"
+    index: "./src/tests/index.ts"
   },
   devtool: "inline-source-map",
+  resolve: {
+    extensions: [".ts", ".html", ".js"]
+  },
   module: {
     rules: [
       {
@@ -26,7 +29,7 @@ const config: Configuration & WebPackDevServerConfig = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: "test-src/index.html"
+      template: "src/tests/index.html"
     })
   ],
   output: {

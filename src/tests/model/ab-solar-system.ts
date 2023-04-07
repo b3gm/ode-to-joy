@@ -7,21 +7,19 @@ type ABThreeVectorProps = "x" | "y" | "z";
 type ABBodyProps = "position" | "velocity" | "force";
 type ABSolarSystemProps = "celestialBodies" | "asteroids";
 
-const abThreeVector = abTypes.object<Vector3, ABThreeVectorProps>({
+const abThreeVector = abTypes.object<Vector3>({
   x: abTypes.float(),
   y: abTypes.float(),
   z: abTypes.float()
 });
 
-const abBody = abTypes.object<Body, ABBodyProps>({
+const abBody = abTypes.object<Body>({
   position: abThreeVector,
   velocity: abThreeVector,
   force: abThreeVector
 });
 
-export function abSolarSystem({celestialBodies, asteroids}: SolarSystem) {
-  return abTypes.object<SolarSystem, ABSolarSystemProps>({
-    celestialBodies: abTypes.array(abBody, celestialBodies.length),
-    asteroids: abTypes.array(abBody, asteroids.length)
-  });
-};
+export const abSolarSystem = abTypes.object<SolarSystem>({
+  celestialBodies: abTypes.array(abBody),
+  asteroids: abTypes.array(abBody)
+});

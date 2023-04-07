@@ -1,10 +1,9 @@
-import { Prng, Rng } from "./rng";
-import { Body } from "./body";
-import { Vector3, Quaternion } from "three";
+import { Prng } from "./rng";
+import { Body, CelestialBody } from "./body";
+import { Vector3 } from "three";
 import { SolarSystem } from "./solar-system";
 import { defaultMeshFactory, MeshFactory } from "./mesh-factory";
 import { RngUtil } from "./rng-util";
-import { Vector } from "../../vector";
 
 const ex = Object.freeze(new Vector3(1.0, 0, 0));
 const ey = Object.freeze(new Vector3(0.0, 1.0, 0.0));
@@ -14,7 +13,7 @@ const DEFAULT_MESH_FACTORY = defaultMeshFactory({
   density: 1.0
 });
 
-export interface SolarSystemProps {
+export interface CreateSolarSystemParameters {
   bodyCount?: number;
   asteroidCount?: number;
   seed?: number;
@@ -77,11 +76,10 @@ function randomBody(
   const localEz = localEy.clone().cross(localEx).normalize();
   const mesh = meshFactory(mass);
   const orientation = rng.rotation();
-  return {
+  return new CelestialBody({
     mass,
     angularVelocity: rng.angularVelocity(),
     orientation: mesh.quaternion.copy(orientation),
-    force: new Vector3(),
     position: mesh.position.copy(
       new Vector3()
         .addScaledVector(
@@ -111,26 +109,25 @@ function randomBody(
       ))
       .multiplyScalar(circularVelocity),
     mesh
-  }
+  });
 }
 
-export function createSolarSystem(props: SolarSystemProps = {}): SolarSystem {
-  const {
-    bodyCount = 10,
-    asteroidCount = 0,
-    radiusScale = 1.0,
-    seed = 4526374,
-    gravityConstant = 1.0,
-    eclipticWobble = 0.0,
-    velocityWobble = 0.0,
-    solarMassRange = [600, 1400],
-    planetaryMassRange = [5, 50],
-    asteroidMassRange = [0.001, 0.01],
-    resonances = COMMON_RESONANCES,
-    asteroidBeltDistributionRange = [0.45, 0.55],
-    radiusWobble = [0.98, 1.02],
-    meshFactory = DEFAULT_MESH_FACTORY
-  } = props;
+export function createSolarSystem({
+  bodyCount = 10,
+  asteroidCount = 0,
+  radiusScale = 1.0,
+  seed = 4526374,
+  gravityConstant = 1.0,
+  eclipticWobble = 0.0,
+  velocityWobble = 0.0,
+  solarMassRange = [600, 1400],
+  planetaryMassRange = [5, 50],
+  asteroidMassRange = [0.001, 0.01],
+  resonances = COMMON_RESONANCES,
+  asteroidBeltDistributionRange = [0.45, 0.55],
+  radiusWobble = [0.98, 1.02],
+  meshFactory = DEFAULT_MESH_FACTORY
+}: CreateSolarSystemParameters = {}): SolarSystem {
   if (bodyCount < 2) {
     throw new Error(`Doesn't make sense to create ${bodyCount} (< 2) bodies.`)
   }
@@ -138,19 +135,23 @@ export function createSolarSystem(props: SolarSystemProps = {}): SolarSystem {
   const celestialBodies: Body[] = [];
   // create a central star
   const starMass = rng.next(solarMassRange);
-  celestialBodies.push({
+  celestialBodies.push(new CelestialBody({
     mass: starMass,
     position: new Vector3(0, 0, 0),
     velocity: new Vector3(0, 0, 0),
-    force: new Vector3(0, 0, 0),
     orientation: rng.rotation(),
     angularVelocity: rng.angularVelocity(),
     mesh: meshFactory(starMass),
-  });
+  }));
   // create a bunch of planets
   let currentRadius = radiusScale;
+  let roundTripFactor = 2 * Math.PI / Math.sqrt(starMass * gravityConstant);
+  let targetRoundTripTime = Math.pow(currentRadius, 1.5) * roundTripFactor;
   for (let i = 0; i != bodyCount; ++i) {
-    currentRadius = currentRadius * rng.nextItem(resonances) * rng.next(radiusWobble);
+    targetRoundTripTime = rng.nextItem(resonances) * targetRoundTripTime;
+    // solve above equation for radius with updated round trip time
+    currentRadius = Math.pow(targetRoundTripTime / roundTripFactor, 0.6667);
+    currentRadius = currentRadius * rng.next(radiusWobble);
     celestialBodies.push(
       randomBody(
         rng,
@@ -200,9 +201,9 @@ export function createSolarSystem(props: SolarSystemProps = {}): SolarSystem {
     .divideScalar(totalMass);
   celestialBodies.forEach(body => body.velocity.sub(systemCogVelocity));
   asteroids.forEach(ast => ast.velocity.sub(systemCogVelocity));
-  return {
+  return new SolarSystem({
     gravityConstant,
     celestialBodies,
     asteroids
-  };
+  });
 }

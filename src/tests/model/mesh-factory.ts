@@ -16,7 +16,7 @@ export const defaultMeshFactory = ({
     return new Mesh(
       new SphereGeometry(radius, 12, 6),
       new MeshPhysicalMaterial({
-        color: 0x0000ff
+        color: 0x0000ff,
       })
     )
   }

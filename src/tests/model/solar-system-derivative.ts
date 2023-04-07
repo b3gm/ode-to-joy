@@ -1,5 +1,5 @@
 import { Body } from "./body";
-import { SolarSystem } from "./solar-system";
+import { SolarSystem, SolarSystemProps } from "./solar-system";
 
 function derivePositionAndVelocity(body: Body) {
   body.position.copy(body.velocity);
@@ -7,11 +7,12 @@ function derivePositionAndVelocity(body: Body) {
   body.velocity.copy(body.force).divideScalar(body.mass);
 }
 
-export function derivative({
-  gravityConstant,
-  celestialBodies,
-  asteroids
-}: SolarSystem): SolarSystem {
+export function derivative(system: SolarSystem): SolarSystem {
+  const {
+    gravityConstant,
+    celestialBodies,
+    asteroids
+  } = system;
   celestialBodies.forEach(b => b.force.set(0, 0, 0));
   asteroids.forEach(a => a.force.set(0, 0, 0));
   for (let i = 0; i !== celestialBodies.length; ++i) {
@@ -20,7 +21,9 @@ export function derivative({
       const jBody = celestialBodies[j];
       const diff = jBody.position.clone().sub(iBody.position);
       const distanceSquare = diff.dot(diff);
-      const gravity = diff.multiplyScalar(gravityConstant * iBody.mass * jBody.mass / Math.pow(distanceSquare, 1.5));
+      const gravity = diff.multiplyScalar(
+        gravityConstant * iBody.mass * jBody.mass / Math.pow(distanceSquare, 1.5)
+      );
       // and add force exchanged to both bodies
       iBody.force.add(gravity);
       jBody.force.addScaledVector(gravity, -1.0);
@@ -34,9 +37,5 @@ export function derivative({
   }
   celestialBodies.forEach(derivePositionAndVelocity);
   asteroids.forEach(derivePositionAndVelocity);
-  return {
-    celestialBodies,
-    asteroids,
-    gravityConstant
-  };
+  return system;
 }

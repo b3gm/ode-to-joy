@@ -1,5 +1,9 @@
 import { Quaternion, Vector3 } from "three";
 import { Rng } from "./rng";
+import { AxialAmount } from "./axial-amount";
+import { Vector } from "../../vector";
+
+const PI_2 = 2 * Math.PI;
 
 export class RngUtil {
 
@@ -35,12 +39,24 @@ export class RngUtil {
       .normalize();
   }
 
-  public angularVelocity() {
-    return new Quaternion()
-      .setFromAxisAngle(
-        new Vector3(this.next(), this.next(), this.next()).normalize(),
-        this.next(- Math.PI / 5, Math.PI / 5),
-      );
+  public randomNormalizedVector() {
+    let vec: Vector3;
+    let rounds = 0;
+    do {
+      ++rounds;
+      vec = new Vector3(this.next(-0.5, 0.5), this.next(), this.next());
+      if (rounds >= 10) {
+        throw new Error("Could not find non null vector after 10 rounds of trying.");
+      }
+    } while(vec.length() === 0.0);// paranoia, should never happen.
+    return vec.normalize();
+  }
+
+  public angularVelocity(maxAngularVelocity = 0.03): AxialAmount {
+    return {
+      axis: this.randomNormalizedVector(),
+      amount: this.next(- maxAngularVelocity, maxAngularVelocity)
+    }
   }
 
   public nextItem<T>(items: T[]): T {
