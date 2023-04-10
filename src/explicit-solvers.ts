@@ -1,4 +1,4 @@
-import { addAllToFirst, addSelf, scalarMultiply, scalarMultiplySelf } from "./array-operations";
+import { addAllToFirst, addSelf, clone, scalarMultiply, scalarMultiplySelf } from "./array-operations";
 
 /**
  * See: https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods
@@ -14,7 +14,7 @@ export type ExplicitSolver = (
 ) => Float64Array; 
 
 export const explicitEulerMethod: ExplicitSolver = (current, stepSize, fDash) => {
-  const k0 = fDash(current);
+  const k0 = fDash(clone(current));
   return addSelf(scalarMultiplySelf(k0, stepSize), current);
 }
 
@@ -23,7 +23,7 @@ export const secondOrderTwoStageMethodFamily: (alpha: number) => ExplicitSolver 
     const b0 = 1 - 0.5 / alpha;
     const b1 = 0.5 / alpha;
     return (current, stepSize, fDash) => {
-      const k0 = fDash(current);
+      const k0 = fDash(clone(current));
       const k1 = fDash(addSelf(scalarMultiply(k0, alpha * stepSize), current));
       return addAllToFirst(
         scalarMultiplySelf(k0, b0 * stepSize),
@@ -36,13 +36,13 @@ export const secondOrderTwoStageMethodFamily: (alpha: number) => ExplicitSolver 
 export const ralstonMethod = secondOrderTwoStageMethodFamily(2.0 / 3.0);
 
 export const midPointMethod: ExplicitSolver = (current, stepSize, fDash) => {
-  const k0 = fDash(current);
+  const k0 = fDash(clone(current));
   const k1 = fDash(addSelf(scalarMultiplySelf(k0, stepSize * 0.5), current));
   return addSelf(scalarMultiplySelf(k1, stepSize), current);
 }
 
 export const heunMethod: ExplicitSolver = (current, stepSize, fDash) => {
-  const k0 = fDash(current);
+  const k0 = fDash(clone(current));
   const k1 = fDash(addSelf(scalarMultiply(k0, stepSize), current));
   return addSelf(scalarMultiplySelf(addSelf(k0, k1), 0.5 * stepSize), current);
 }
@@ -51,7 +51,7 @@ export const rungeKutta4: ExplicitSolver = (current, stepSize, fDash) => {
   const halfStepSize = stepSize * 0.5;
   const stepSizeBySix = stepSize * oneOverSix;
   const stepSizeByThree = stepSize * oneThird;
-  const k0 = fDash(current);
+  const k0 = fDash(clone(current));
   const k1 = fDash(addSelf(scalarMultiply(k0, halfStepSize), current));
   const k2 = fDash(addSelf(scalarMultiply(k1, halfStepSize), current));
   const k3 = fDash(addSelf(scalarMultiply(k2, stepSize), current));
@@ -66,7 +66,7 @@ export const rungeKutta4: ExplicitSolver = (current, stepSize, fDash) => {
 
 export const rungeKuttaThreeEightsRule: ExplicitSolver = (current, stepSize, fDash) => {
   const stepSizeOverThree = stepSize * oneThird;
-  const k0 = fDash(current);
+  const k0 = fDash(clone(current));
   const k1 = fDash(addSelf(scalarMultiply(k0, stepSizeOverThree), current));
   const k2 = fDash(
     addAllToFirst(
