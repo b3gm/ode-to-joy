@@ -1,6 +1,6 @@
 import { Prng } from "./rng";
 import { Body, CelestialBody } from "./body";
-import { Vector3 } from "three";
+import { Light, PointLight, Vector3 } from "three";
 import { SolarSystem } from "./solar-system";
 import { defaultMeshFactory, MeshFactory } from "./mesh-factory";
 import { RngUtil } from "./rng-util";
@@ -52,6 +52,7 @@ function randomBody(
     eclipticWobble,
     gravityConstant,
     meshFactory,
+    light
   }: {
     massRange: [number, number],
     radius: number,
@@ -59,7 +60,8 @@ function randomBody(
     velocityWobble: number,
     eclipticWobble: number,
     gravityConstant: number,
-    meshFactory: MeshFactory
+    meshFactory: MeshFactory,
+    light?: Light
   }
 ): Body {
   const mass = rng.next(massRange);
@@ -108,7 +110,8 @@ function randomBody(
         rng.next(- velocityWobble, velocityWobble)
       ))
       .multiplyScalar(circularVelocity),
-    mesh
+    mesh,
+    light
   });
 }
 
@@ -142,6 +145,7 @@ export function createSolarSystem({
     orientation: rng.rotation(),
     angularVelocity: rng.angularVelocity(),
     mesh: meshFactory(starMass),
+    light: new PointLight(0xffffff, 2.0),
   }));
   // create a bunch of planets
   let currentRadius = radiusScale;

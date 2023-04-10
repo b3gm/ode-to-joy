@@ -1,4 +1,4 @@
-import { Mesh, Quaternion, Vector3 } from "three";
+import { Light, Mesh, Quaternion, Scene, Vector3 } from "three";
 import { AxialAmount } from "./axial-amount";
 import { LQuaternion, LVec3 } from "./literals";
 
@@ -10,6 +10,7 @@ export interface Body {
   velocity: Vector3;
   force: Vector3;
   mesh: Mesh;
+  light?: Light;
 
   tic(delta: number): void;
 }
@@ -21,6 +22,7 @@ export interface BodyParameters {
   position: LVec3;
   velocity: LVec3;
   mesh: Mesh;
+  light?: Light;
 }
 
 export function assignQuaternion(
@@ -44,6 +46,7 @@ export abstract class BaseBody implements Body {
   public readonly velocity: Vector3;
   public readonly force: Vector3;
   public readonly mesh:  Mesh;
+  public readonly light?: Light;
 
   constructor(parameters: BodyParameters) {
     this.mass = parameters.mass;
@@ -54,6 +57,7 @@ export abstract class BaseBody implements Body {
     this.velocity = assignVector(new Vector3(), parameters.velocity);
     this.force = new Vector3();
     this.mesh = mesh;
+    this.light = parameters.light;
   }
 
   abstract tic(delta: number): void;
@@ -75,7 +79,10 @@ export class CelestialBody extends BaseBody {
         .conjugate()
         .multiply(this.orientation),
       angVelQuat
-    )
+    );
+    if (this.light) {
+      this.light.position.copy(this.position);
+    }
   }
 }
 

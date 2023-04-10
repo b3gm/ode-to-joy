@@ -1,11 +1,21 @@
 import * as three from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { heunMethod, midPointMethod } from "../explicit-solvers";
+import { heunMethod, midPointMethod, rungeKuttaThreeEightsRule } from "../explicit-solvers";
 import { createGenericExplicitSolver } from "../generic-explicit-solver";
 import { abSolarSystem } from "./model/ab-solar-system";
 import { createSolarSystem } from "./model/create-solar-system";
 import { SolarSystem } from "./model/solar-system";
 import { derivative } from "./model/solar-system-derivative";
+
+function addSolarSystemToScene(solarSystem: SolarSystem, scene: three.Scene) {
+  solarSystem.forEachBody((body) => {
+    scene.add(body.mesh);
+    const light = body.light;
+    if (light) {
+      scene.add(light);
+    }
+  })
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Dom ready!");
@@ -13,15 +23,21 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!cvs) {
     throw new Error("Canvas not found.");
   }
-  const solarSystem = createSolarSystem({radiusScale: 10.0, bodyCount: 4, asteroidCount: 20});
+  const solarSystem = createSolarSystem({
+    radiusScale: 20.0,
+    bodyCount: 6,
+    asteroidCount: 20,
+    eclipticWobble: 0.3
+  });
   const scene = new three.Scene();
-  solarSystem.forEachBody(body => scene.add(body.mesh));
+  addSolarSystemToScene(solarSystem, scene);
+  /*
   const hemiLight = new three.HemisphereLight(
     new three.Color(0xa0a0ff),
     new three.Color(0xa0a0ff),
     1.0
   );
-  scene.add(hemiLight);
+  scene.add(hemiLight);//*/
   const camera = new three.PerspectiveCamera(
     65.0,
     cvs.width / cvs.height,
@@ -40,7 +56,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const solarSystemSolver = createGenericExplicitSolver<SolarSystem>({
     itemType: abSolarSystem,
-    solver: midPointMethod,
+    //solver: midPointMethod,
+    solver: rungeKuttaThreeEightsRule
   })(derivative);
 
   function updateAndRender(delta: number) {
