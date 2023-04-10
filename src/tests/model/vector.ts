@@ -1,4 +1,4 @@
-import { assertSameLength } from "./array-operations";
+import { assertSameLength } from "../../array-operations";
 
 
 export class Vector {

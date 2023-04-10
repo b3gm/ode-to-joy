@@ -4,10 +4,12 @@
   "description": "Solvers for ordinary differential equations.",
   "main": "dist/index.js",
   "scripts": {
+    "clean": "rm -rf dist test-dist && rm -f ode-to-joy.tgz",
     "test": "npx jest",
     "test:coverage": "npx jest --collect-coverage",
     "build:production": "npx tsc -p tsconfig.prod.json",
-    "start:dev": "npx webpack serve -c webpack.testconfig.ts"
+    "start:dev": "npx webpack serve -c webpack.testconfig.ts",
+    "prepare": "npm run clean && npm run build:production"
   },
   "repository": {
     "type": "git",
