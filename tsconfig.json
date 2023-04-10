@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "CommonJS",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "rootDir": ".",
+    "outDir": "test-dist",
+    "sourceMap": true
+  },
+  "exclude": [
+    "./jest.config.ts",
+    "./webpack.testconfig.ts"
+  ]
+}
