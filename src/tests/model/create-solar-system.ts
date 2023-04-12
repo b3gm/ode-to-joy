@@ -131,8 +131,8 @@ export function createSolarSystem({
   radiusWobble = [0.98, 1.02],
   meshFactory = DEFAULT_MESH_FACTORY
 }: CreateSolarSystemParameters = {}): SolarSystem {
-  if (bodyCount < 2) {
-    throw new Error(`Doesn't make sense to create ${bodyCount} (< 2) bodies.`)
+  if (bodyCount < 1) {
+    throw new Error(`Doesn't make sense to create ${bodyCount} (< 1) bodies.`)
   }
   const rng = new RngUtil(new Prng(seed));
   const celestialBodies: Body[] = [];

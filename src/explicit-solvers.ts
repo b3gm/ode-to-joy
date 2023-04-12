@@ -11,7 +11,7 @@ export type ExplicitSolver = (
   current: Float64Array,
   stepSize: number,
   fDash: (current: Float64Array) => Float64Array
-) => Float64Array; 
+) => Float64Array;
 
 export const explicitEulerMethod: ExplicitSolver = (current, stepSize, fDash) => {
   const k0 = fDash(clone(current));

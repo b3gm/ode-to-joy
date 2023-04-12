@@ -17,8 +17,13 @@
   },
   "keywords": [
     "ordinary_differential_equations",
+    "ode",
+    "initial_value_problem",
     "runge_kutta",
-    "ode"
+    "heun_method",
+    "midpoint_method",
+    "explicit_euler_method",
+    "integration"
   ],
   "author": "b3gm",
   "license": "MIT",
