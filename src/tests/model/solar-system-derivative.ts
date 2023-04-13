@@ -13,8 +13,7 @@ export function derivative(system: SolarSystem): SolarSystem {
     celestialBodies,
     asteroids
   } = system;
-  celestialBodies.forEach(b => b.force.set(0, 0, 0));
-  asteroids.forEach(a => a.force.set(0, 0, 0));
+  system.forEachBody(b => b.force.set(0, 0, 0));
   for (let i = 0; i !== celestialBodies.length; ++i) {
     const iBody = celestialBodies[i];
     for (let j = 0; j != i; ++j) {// only need to iterate through j < i
@@ -31,11 +30,12 @@ export function derivative(system: SolarSystem): SolarSystem {
     for (const asteroid of asteroids) {
       const diff = iBody.position.clone().sub(asteroid.position);
       const distanceSquare = diff.dot(diff);
-      const gravity = diff.multiplyScalar(gravityConstant * iBody.mass * asteroid.mass / Math.pow(distanceSquare, 1.5));
+      const gravity = diff.multiplyScalar(
+        gravityConstant * iBody.mass * asteroid.mass / Math.pow(distanceSquare, 1.5)
+      );
       asteroid.force.add(gravity);
     }
   }
-  celestialBodies.forEach(derivePositionAndVelocity);
-  asteroids.forEach(derivePositionAndVelocity);
+  system.forEachBody(derivePositionAndVelocity);
   return system;
 }

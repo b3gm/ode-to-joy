@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
     antialias: true
   });
 
-  const solarSystemSolver = createGenericExplicitSolver<SolarSystem>({
+  const solarSystemSolver = createGenericExplicitSolver({
     itemType: abSolarSystem,
     //solver: midPointMethod,
     solver: rungeKuttaThreeEightsRule
