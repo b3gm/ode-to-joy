@@ -1,6 +1,8 @@
 .vscode
+.github/
 .gitignore
 src/
 /jest.config.ts
 /tsconfig*.json
 /webpack*.ts
+*.tgz
