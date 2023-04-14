@@ -1,5 +1,5 @@
 {
-  "name": "ode-to-joy",
+  "name": "@b3gm/ode-to-joy",
   "version": "0.0.1",
   "description": "Solvers for ordinary differential equations.",
   "main": "dist/index.js",
@@ -49,5 +49,9 @@
     "webpack-dev-server": "^4.11.1"
   },
   "dependencies": {
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   }
 }
