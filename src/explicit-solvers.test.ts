@@ -8,6 +8,8 @@ import {
   rungeKuttaThreeEightsRule
 } from "./explicit-solvers";
 
+import * as explicitSolvers from "./explicit-solvers";
+
 const solvers: {name: string, solver: ExplicitSolver, maxDeviation: number}[] = [
   {name: "Explicit Euler", solver: explicitEulerMethod, maxDeviation: 0.3},
   {name: "Heun", solver: heunMethod, maxDeviation: 0.0015},
@@ -50,3 +52,20 @@ for (const {name, solver, maxDeviation} of solvers) {
     });
   });
 }
+
+describe("README example", () => {
+  it ("should yield correct solution", () => {
+    let current = new Float64Array(1);
+    current[0] = 1;
+    for (let i = 0; i != 100; ++i) {
+      current = explicitSolvers.rungeKutta4(
+        current,
+        0.01,
+        v => v // fDash: y' = y
+      );
+    }
+    console.log("Solution:", current[0]); // 2.718281828234403
+
+    expect(current[0]).toBeCloseTo(2.718281828, 1.0e-8);
+  });
+})

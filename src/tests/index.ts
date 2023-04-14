@@ -1,6 +1,6 @@
 import * as three from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { heunMethod, midPointMethod, rungeKuttaThreeEightsRule } from "../explicit-solvers";
+import { rungeKuttaThreeEightsRule } from "../explicit-solvers";
 import { createGenericExplicitSolver } from "../generic-explicit-solver";
 import { abSolarSystem } from "./model/ab-solar-system";
 import { createSolarSystem } from "./model/create-solar-system";
@@ -31,6 +31,11 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   const scene = new three.Scene();
   addSolarSystemToScene(solarSystem, scene);
+  const ambientLight = new three.AmbientLight(
+    0xffffff,
+    0.2
+  );
+  scene.add(ambientLight);
   /*
   const hemiLight = new three.HemisphereLight(
     new three.Color(0xa0a0ff),
@@ -52,9 +57,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const renderer = new three.WebGLRenderer({
     canvas: cvs,
     logarithmicDepthBuffer: true,
-  })
+    antialias: true
+  });
 
-  const solarSystemSolver = createGenericExplicitSolver<SolarSystem>({
+  const solarSystemSolver = createGenericExplicitSolver({
     itemType: abSolarSystem,
     //solver: midPointMethod,
     solver: rungeKuttaThreeEightsRule

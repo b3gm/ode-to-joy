@@ -1,4 +1,4 @@
-import { Light, Mesh, Quaternion, Scene, Vector3 } from "three";
+import { Light, Mesh, Quaternion, Vector3 } from "three";
 import { AxialAmount } from "./axial-amount";
 import { LQuaternion, LVec3 } from "./literals";
 
