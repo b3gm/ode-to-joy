@@ -1,6 +1,6 @@
 {
   "name": "@b3gm/ode-to-joy",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Solvers for ordinary differential equations.",
   "main": "dist/index.js",
   "scripts": {
