@@ -1,7 +1,8 @@
 import { ABDynamicSizeType, ABFixedSizeType, ABType } from "./ab-type";
+import { AnyFunction } from "./utils";
 
 export type ABObjectDescription<T> = {
-  [K in keyof T as T[K] extends (string | undefined | null | Function) ? never : K]?:
+  [K in keyof T as T[K] extends (string | undefined | null | AnyFunction) ? never : K]?:
     ABType<T[K]>;
 }
 

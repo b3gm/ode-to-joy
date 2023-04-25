@@ -3,9 +3,6 @@ import { abTypes } from "../../index";
 import { Body } from "./body";
 import { SolarSystem } from "./solar-system";
 
-type ABThreeVectorProps = "x" | "y" | "z";
-type ABBodyProps = "position" | "velocity" | "force";
-type ABSolarSystemProps = "celestialBodies" | "asteroids";
 
 const abThreeVector = abTypes.object<Vector3>({
   x: abTypes.float(),

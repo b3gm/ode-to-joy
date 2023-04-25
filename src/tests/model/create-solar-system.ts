@@ -6,9 +6,6 @@ import { defaultMeshFactory, MeshFactory } from "./mesh-factory";
 import { RngUtil } from "./rng-util";
 
 const ex = Object.freeze(new Vector3(1.0, 0, 0));
-const ey = Object.freeze(new Vector3(0.0, 1.0, 0.0));
-const ez = Object.freeze(new Vector3(0.0, 0.0, 1.0));
-const PI_HALF = Math.PI / 2.0;
 const DEFAULT_MESH_FACTORY = defaultMeshFactory({
   density: 1.0
 });
@@ -149,7 +146,7 @@ export function createSolarSystem({
   }));
   // create a bunch of planets
   let currentRadius = radiusScale;
-  let roundTripFactor = 2 * Math.PI / Math.sqrt(starMass * gravityConstant);
+  const roundTripFactor = 2 * Math.PI / Math.sqrt(starMass * gravityConstant);
   let targetRoundTripTime = Math.pow(currentRadius, 1.5) * roundTripFactor;
   for (let i = 0; i != bodyCount; ++i) {
     targetRoundTripTime = rng.nextItem(resonances) * targetRoundTripTime;

@@ -6,7 +6,7 @@ import {
 } from "./ab-type";
 import { BaseABFixedSizeType } from "./ab-type";
 import { ABFixedSizeType, ABType } from "./ab-type";
-import { unknownEnumValue } from "./utils";
+import { AnyFunction, unknownEnumValue } from "./utils";
 
 export interface Property<T, P, K extends keyof P> {
   readonly abType: ABType<P[K]>;
@@ -40,7 +40,7 @@ type PropertyDescription<T, P, K extends keyof P> =
   | DynamicSizePropertyDescription<T, P, K>;
 
 export type ValueObjectDescription<T, P> = {
-  readonly [K in keyof P as P[K] extends (string | undefined | null | Function) ? never : K]?:
+  readonly [K in keyof P as P[K] extends (string | undefined | null | AnyFunction) ? never : K]?:
     Property<T, P, K>;
 }
 
@@ -50,7 +50,7 @@ export function valueObject<T, P>(
 ): ABType<T> {
   const fixedSizeProperties: FixedSizePropertyDescription<T, P, keyof P>[] = [];
   const dynamicSizeProperties: DynamicSizePropertyDescription<T, P, keyof P>[] = [];
-  for (let key in description) {
+  for (const key in description) {
     const voProperty = description[key];
     if (voProperty) {
       const {abType, accessor} = voProperty;
@@ -94,7 +94,7 @@ function applyValues<T, P, K extends keyof P, ABT extends PropertyDescription<T,
   reader: FloatReader,
   value: T
 ) {
-  for (let {key, abType, accessor} of properties) {
+  for (const {key, abType, accessor} of properties) {
     const propertyValue = accessor(value);
     ctorProps[key] = abType.applyValues(
       reader,

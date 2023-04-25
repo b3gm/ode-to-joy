@@ -21,7 +21,7 @@ export class ABFloat extends BaseABFixedSizeType<number> {
     writer(value);
   }
 
-  applyValues(reader: FloatReader, _: number): number {
+  applyValues(reader: FloatReader): number {
     return reader();
   }
 

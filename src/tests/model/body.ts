@@ -29,7 +29,6 @@ export function assignQuaternion(
   q: Quaternion,
   {x, y, z, w}: LQuaternion
 ): Quaternion {
-  q.multiply
   return q.set(x, y, z, w);
 }
 
@@ -92,7 +91,7 @@ export class Ship extends BaseBody {
     super(parameters);
   }
 
-  public tic(delta: number): void {
-    
+  public tic(): void {
+    // intentionally empty
   }
 }

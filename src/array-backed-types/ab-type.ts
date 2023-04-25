@@ -40,8 +40,6 @@ export interface ABDynamicSizeType<T> extends IABType<T> {
 
 export abstract class BaseABDynamicSizeType<T> implements ABDynamicSizeType<T> {
   readonly abSizeType = "DYNAMIC";
-  constructor() {
-  }
 
   public abstract getSize(value: T): number;
   public abstract applyValues(reader: FloatReader, value: T): T;

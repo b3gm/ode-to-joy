@@ -23,19 +23,14 @@ class Body {
   }
   
   applyForce(force: TestVector): void {
-    force = new TestVector(this.force.x + force.x, this.force.y + force.y, this.force.z + force.z);
-  };
+    this.force = new TestVector(this.force.x + force.x, this.force.y + force.y, this.force.z + force.z);
+  }
 }
 
 interface LVec3 {
   readonly x: number;
   readonly y: number;
   readonly z: number;
-}
-
-interface PartialVector {
-  x: number;
-  y: number;
 }
 
 describe("ABObjectType", () => {
@@ -47,7 +42,9 @@ describe("ABObjectType", () => {
     const testVectorType2 = abTypes.object<TestVector>({
       x: abTypes.float(),
       z: abTypes.float()
-    })
+    });
+    expect(testVectorType).toBeTruthy();
+    expect(testVectorType2).toBeTruthy();
   });
   it ("should reject invalid keys", () => {
     // @ts-expect-error "foo" is not a valid key in TestVector
@@ -55,7 +52,8 @@ describe("ABObjectType", () => {
       x: abTypes.float(),
       y: abTypes.float(),
       foo: abTypes.float()
-    })
+    });
+    expect(testVectorType).toBeTruthy();
   });
   it ("should work without type parameters", () => {
     const testType: ABType<LVec3> = abTypes.object({
@@ -63,6 +61,7 @@ describe("ABObjectType", () => {
       y: abTypes.float(),
       z: abTypes.float()
     });
+    expect(testType).toBeTruthy();
   });
   it ("should suggest public object property types", () => {
     const testVectorType = abTypes.object<TestVector>({
@@ -74,6 +73,7 @@ describe("ABObjectType", () => {
       position: testVectorType,
       velocity: testVectorType
     });
+    expect(bodyType).toBeTruthy();
   })
 });
 
@@ -88,6 +88,7 @@ describe("ABArray<TestVector>", () => {
       testVectorType,
       3
     );
+    expect(testVectorArrayType).toBeTruthy();
   });
 });
 
@@ -118,6 +119,7 @@ describe("ABValue<TestVector>", () => {
     const bodyType: ABType<Body> = abTypes.object({
       position: testVectorValueType,
       velocity: testVectorValueType
-    })
+    });
+    expect(bodyType).toBeTruthy();
   })
 })

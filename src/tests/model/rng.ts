@@ -7,9 +7,9 @@ export interface Rng {
  */
 export class Prng implements Rng {
 
-  private a: number = 32579;
-  private b: number = 2854889;
-  private c: number = 0x8fffffff;
+  private a = 32579;
+  private b = 2854889;
+  private c = 0x8fffffff;
   private x: number;
 
   constructor(seed: number) {

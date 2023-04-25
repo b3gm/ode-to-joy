@@ -1,4 +1,4 @@
-import { Material, Mesh, MeshPhysicalMaterial, SphereGeometry, Color, BooleanKeyframeTrack, MeshStandardMaterial } from "three";
+import { Mesh, SphereGeometry, Color, MeshStandardMaterial } from "three";
 
 const black = new Color(0);
 const white = new Color(0xffffff);

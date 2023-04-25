@@ -1,6 +1,8 @@
 .vscode
 .github/
 .gitignore
+.npmrc
+.eslintrc.yml
 src/
 /jest.config.ts
 /tsconfig*.json

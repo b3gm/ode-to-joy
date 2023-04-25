@@ -4,6 +4,8 @@ import { float } from "./array-backed-types/ab-float";
 import { valueObject } from "./array-backed-types/ab-value";
 import { ABType } from "./array-backed-types/ab-type";
 
+export { createGenericExplicitSolver } from "./generic-explicit-solver";
+
 export * as explicitSolvers from "./explicit-solvers";
 
 export const abTypes = {

@@ -8,7 +8,7 @@ import {
 } from "./ab-type";
 import { unknownEnumValue } from "./utils";
 
-export function array<T>(abType: ABType<T>, fixedLength: number = -1.0): ABType<T[]> {
+export function array<T>(abType: ABType<T>, fixedLength = -1.0): ABType<T[]> {
   if (fixedLength < 0) {
     return new ABDynamicSizeArray(abType);
   } else {

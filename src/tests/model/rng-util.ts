@@ -1,9 +1,7 @@
 import { Quaternion, Vector3 } from "three";
 import { Rng } from "./rng";
 import { AxialAmount } from "./axial-amount";
-import { Vector } from "./vector";
 
-const PI_2 = 2 * Math.PI;
 
 export class RngUtil {
 

@@ -1,5 +1,3 @@
-import { array } from "./array-backed-types/ab-array";
-
 export function assertSameLength(a: Float64Array, b: Float64Array) {
   if (a.length !== b.length) {
     throw new Error(

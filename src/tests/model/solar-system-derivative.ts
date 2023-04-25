@@ -1,5 +1,5 @@
 import { Body } from "./body";
-import { SolarSystem, SolarSystemProps } from "./solar-system";
+import { SolarSystem } from "./solar-system";
 
 function derivePositionAndVelocity(body: Body) {
   body.position.copy(body.velocity);

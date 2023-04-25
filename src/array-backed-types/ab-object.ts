@@ -20,7 +20,7 @@ export function object<
   let fixedSize = 0;
   const fixedProperties: ABFixedSizeObjectProperty<T, keyof T>[] = [];
   const dynamicProperties: ABDynamicSizeObjectProperty<T, keyof T>[] = [];
-  for (let key in props) {
+  for (const key in props) {
     const abType = props[key];
     if (abType !== undefined) {
       const abSizeType = abType.abSizeType;
